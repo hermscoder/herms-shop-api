@@ -1,6 +1,5 @@
 package com.herms.ecommerce.dao;
 
-import com.herms.ecommerce.utils.IntegrationTestConnection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,6 +13,8 @@ import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
+
+import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.blankOrNullString;
 import static org.hamcrest.Matchers.is;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Testcontainers
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ProductEndpointIntegrationTest extends IntegrationTestConnection {
+class ProductEndpointIntegrationTest {
     @Autowired
     private MockMvc mvc;
 
@@ -42,7 +43,7 @@ class ProductEndpointIntegrationTest extends IntegrationTestConnection {
             .withEnv("MYSQL_ROOT_PASSWORD", "ecommerceapp");
 
     @DynamicPropertySource
-    static void kafkaProperties(DynamicPropertyRegistry registry) {
+    static void setupDatabaseProperties(DynamicPropertyRegistry registry) {
         registry.add("spring.datasource.url", () -> mySQLContainer.getJdbcUrl());
         registry.add("spring.datasource.driverClassName", () -> mySQLContainer.getDriverClassName());
         registry.add("spring.datasource.username", () -> mySQLContainer.getUsername());
@@ -50,7 +51,7 @@ class ProductEndpointIntegrationTest extends IntegrationTestConnection {
     }
 
     @Test
-    void testApiUrls() throws Exception {
+    void testApiBasePathUrls() throws Exception {
         this.mvc.perform(get("/api")) //
                 .andDo(print()) //
                 .andExpect(status().isOk()) //
@@ -58,29 +59,6 @@ class ProductEndpointIntegrationTest extends IntegrationTestConnection {
                 .andExpect(jsonPath("$._links.products.href", is("http://localhost/api/products{?page,size,sort}")))
                 .andExpect(jsonPath("$._links.productCategory.href", is("http://localhost/api/product-category{?page,size,sort}")))
                 .andExpect(jsonPath("$._links.profile.href", is("http://localhost/api/profile")));
-    }
-
-    @Test
-    void testProductList() throws Exception {
-
-        this.mvc.perform(get("/api/products"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaTypes.HAL_JSON))
-                .andExpect(jsonPath("$._embedded.products[0].sku", is("BOOK-TECH-1000")))
-                .andExpect(jsonPath("$._embedded.products[0].name", is("JavaScript - The Fun Parts")))
-                .andExpect(jsonPath("$._embedded.products[0].description", is("Learn JavaScript")))
-                .andExpect(jsonPath("$._embedded.products[0].unitPrice", is(19.99)))
-                .andExpect(jsonPath("$._embedded.products[0].imageUrl", is("assets/images/products/placeholder.png")))
-                .andExpect(jsonPath("$._embedded.products[0].active", is(true)))
-                .andExpect(jsonPath("$._embedded.products[0].unitsInStock", is(100)))
-                .andExpect(jsonPath("$._embedded.products[0].dateCreated", is("2023-09-03")))
-                .andExpect(jsonPath("$._embedded.products[0].lastUpdated", blankOrNullString()))
-                .andExpect(jsonPath("$._embedded.products[0]._links.self.href", is("http://localhost/api/products/1")))
-                .andExpect(jsonPath("$._embedded.products[0]._links.product.href", is("http://localhost/api/products/1")))
-                .andExpect(jsonPath("$._embedded.products[0]._links.category.href", is("http://localhost/api/products/1/category")))
-                .andExpect(jsonPath("$._links.self.href", is("http://localhost/api/products?page=0&size=20")))
-                .andExpect(jsonPath("$._links.profile.href", is("http://localhost/api/profile/products")));
     }
 
     @Test
@@ -104,6 +82,28 @@ class ProductEndpointIntegrationTest extends IntegrationTestConnection {
                 .andExpect(status().isMethodNotAllowed());
     }
 
+    @Test
+    void testProductList() throws Exception {
+
+        this.mvc.perform(get("/api/products"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaTypes.HAL_JSON))
+                .andExpect(jsonPath("$._embedded.products[0].sku", is("BOOK-TECH-1000")))
+                .andExpect(jsonPath("$._embedded.products[0].name", is("JavaScript - The Fun Parts")))
+                .andExpect(jsonPath("$._embedded.products[0].description", is("Learn JavaScript")))
+                .andExpect(jsonPath("$._embedded.products[0].unitPrice", is(19.99)))
+                .andExpect(jsonPath("$._embedded.products[0].imageUrl", is("assets/images/products/placeholder.png")))
+                .andExpect(jsonPath("$._embedded.products[0].active", is(true)))
+                .andExpect(jsonPath("$._embedded.products[0].unitsInStock", is(100)))
+                .andExpect(jsonPath("$._embedded.products[0].dateCreated", is(LocalDate.now().toString())))
+                .andExpect(jsonPath("$._embedded.products[0].lastUpdated", blankOrNullString()))
+                .andExpect(jsonPath("$._embedded.products[0]._links.self.href", is("http://localhost/api/products/1")))
+                .andExpect(jsonPath("$._embedded.products[0]._links.product.href", is("http://localhost/api/products/1")))
+                .andExpect(jsonPath("$._embedded.products[0]._links.category.href", is("http://localhost/api/products/1/category")))
+                .andExpect(jsonPath("$._links.self.href", is("http://localhost/api/products?page=0&size=20")))
+                .andExpect(jsonPath("$._links.profile.href", is("http://localhost/api/profile/products")));
+    }
 
     @Test
     void testProductCategoryList() throws Exception {
