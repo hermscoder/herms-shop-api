@@ -1,0 +1,22 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="HermsShopEcommerceApplication" type="Application" factoryName="Application" nameIsGenerated="true">
+    <envs>
+      <env name="DB_HOST" value="localhost" />
+      <env name="DB_PORT" value="3307" />
+      <env name="DB_SCHEMA" value="full-stack-ecommerce" />
+      <env name="DB_USERNAME" value="ecommerceapp" />
+      <env name="DB_PASSWORD" value="ecommerceapp" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.herms.ecommerce.HermsShopEcommerceApplication" />
+    <module name="herms-shop-ecommerce" />
+    <extension name="coverage">
+      <pattern>
+        <option name="PATTERN" value="com.herms.ecommerce.*" />
+        <option name="ENABLED" value="true" />
+      </pattern>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
