@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:4200", "https://herms-shop-api.onrender.com"})
+@CrossOrigin(origins = {"http://localhost:4200", "https://hermscoder.github.io"})
 @RepositoryRestResource
 public interface StateRepository extends JpaRepository<State, Integer> {
 
