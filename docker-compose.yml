@@ -4,25 +4,25 @@ networks:
     driver: bridge
 
 services:
-  hermsshop-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-#    image: hermscoder/herms-shop-api we will need this when the image is in the hub
-    container_name: hermsshop-api
-    environment:
-      DB_HOST: mysqldb
-      DB_PORT: 3306
-      DB_SCHEMA: full-stack-ecommerce
-      DB_USERNAME: ecommerceapp
-      DB_PASSWORD: ecommerceapp
-    ports:
-    - 8080:8080
-    networks:
-      - local-network
-    depends_on:
-      mysqldb:
-        condition: service_healthy
+#  hermsshop-api:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+##    image: hermscoder/herms-shop-api we will need this when the image is in the hub
+#    container_name: hermsshop-api
+#    environment:
+#      DB_HOST: mysqldb
+#      DB_PORT: 3306
+#      DB_SCHEMA: full-stack-ecommerce
+#      DB_USERNAME: ecommerceapp
+#      DB_PASSWORD: ecommerceapp
+#    ports:
+#    - 8080:8080
+#    networks:
+#      - local-network
+#    depends_on:
+#      mysqldb:
+#        condition: service_healthy
   mysqldb:
     image: mysql:8.0
     container_name: mysqldb
@@ -43,3 +43,4 @@ services:
     volumes:
       - "./scripts/init.sql:/docker-entrypoint-initdb.d/1.sql"
       - "./scripts/data.sql:/docker-entrypoint-initdb.d/2.sql"
+      - "./scripts/create-order-tables.sql:/docker-entrypoint-initdb.d/3.sql"
